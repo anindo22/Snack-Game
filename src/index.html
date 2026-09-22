@@ -19,12 +19,11 @@
             background-size: cover;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             display: flex;
-            flex-direction: column;
             align-items: center;
             justify-content: center;
             min-height: 100vh;
             padding: 10px;
-            overflow: hidden; /* Prevents whole page scrolling */
+            overflow: hidden;
         }
         .game-card {
             background: rgba(0, 0, 0, 0.45);
@@ -32,7 +31,7 @@
             -webkit-backdrop-filter: blur(8px);
             border: 2px solid rgba(255, 255, 255, 0.4);
             border-radius: 20px;
-            padding: 15px;
+            padding: 20px;
             box-shadow: 0 15px 35px rgba(0, 0, 0, 0.6);
             display: flex;
             flex-direction: column;
@@ -93,6 +92,15 @@
             background: #FF5722;
             color: white;
         }
+        
+        .main-game-layout {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+            gap: 15px;
+        }
+
         #gameCanvas {
             border: 3px solid #ffffff;
             border-radius: 15px;
@@ -104,27 +112,26 @@
             aspect-ratio: 1 / 1;
         }
         
-        /* Larger Mobile Controls */
+        /* Mobile Controls */
         .controls-container {
             display: flex;
             flex-direction: column;
             align-items: center;
-            margin-top: 15px;
             gap: 8px;
             width: 100%;
         }
         .control-row {
             display: flex;
-            gap: 15px;
+            gap: 12px;
             justify-content: center;
         }
         .arrow-btn {
-            width: 60px;
-            height: 60px;
+            width: 58px;
+            height: 58px;
             background: rgba(255, 255, 255, 0.95);
             border: 3px solid #4CAF50;
             border-radius: 50%;
-            font-size: 24px;
+            font-size: 22px;
             font-weight: bold;
             color: #2e7d32;
             display: flex;
@@ -139,6 +146,26 @@
             background: #4CAF50;
             color: white;
             transform: scale(0.9);
+        }
+
+        /* Desktop Layout Fix: Moves controls to the right side on larger screens */
+        @media (min-width: 768px) {
+            .game-card {
+                max-width: 680px;
+            }
+            .main-game-layout {
+                flex-direction: row;
+                justify-content: center;
+                align-items: center;
+                gap: 25px;
+            }
+            #gameCanvas {
+                width: 350px;
+            }
+            .controls-container {
+                width: auto;
+                justify-content: center;
+            }
         }
     </style>
 </head>
@@ -159,17 +186,19 @@
             <button class="btn reload-btn" onclick="resetGame()">Reload 🔄</button>
         </div>
 
-        <canvas id="gameCanvas" width="352" height="352"></canvas>
+        <div class="main-game-layout">
+            <canvas id="gameCanvas" width="352" height="352"></canvas>
 
-        <!-- Touch Controls for Mobile -->
-        <div class="controls-container">
-            <div class="control-row">
-                <button class="arrow-btn" onclick="handleTouch('ArrowUp')">▲</button>
-            </div>
-            <div class="control-row">
-                <button class="arrow-btn" onclick="handleTouch('ArrowLeft')">◄</button>
-                <button class="arrow-btn" onclick="handleTouch('ArrowDown')">▼</button>
-                <button class="arrow-btn" onclick="handleTouch('ArrowRight')">►</button>
+            <!-- Controls (Placed right side in desktop, bottom in mobile) -->
+            <div class="controls-container">
+                <div class="control-row">
+                    <button class="arrow-btn" onclick="handleTouch('ArrowUp')">▲</button>
+                </div>
+                <div class="control-row">
+                    <button class="arrow-btn" onclick="handleTouch('ArrowLeft')">◄</button>
+                    <button class="arrow-btn" onclick="handleTouch('ArrowDown')">▼</button>
+                    <button class="arrow-btn" onclick="handleTouch('ArrowRight')">►</button>
+                </div>
             </div>
         </div>
     </div>
@@ -178,7 +207,6 @@
         const canvas = document.getElementById("gameCanvas");
         const ctx = canvas.getContext("2d");
 
-        // Bigger Snake Grid size
         const gridSize = 22;
         const tileCount = canvas.width / gridSize;
 
@@ -291,7 +319,7 @@
                 snake.pop();
             }
 
-            // Draw Bigger Apple
+            // Draw Apple
             ctx.fillStyle = "#ff3d00";
             ctx.beginPath();
             ctx.arc(food.x * gridSize + gridSize/2, food.y * gridSize + gridSize/2, gridSize/2 - 2, 0, Math.PI * 2);
@@ -299,7 +327,7 @@
             ctx.fillStyle = "#2e7d32";
             ctx.fillRect(food.x * gridSize + gridSize/2 - 1, food.y * gridSize + 2, 3, 5);
 
-            // Draw Bigger Snake Body
+            // Draw Snake
             for (let i = 0; i < snake.length; i++) {
                 const x = snake[i].x * gridSize + gridSize / 2;
                 const y = snake[i].y * gridSize + gridSize / 2;
@@ -377,7 +405,6 @@
         }
 
         window.addEventListener("keydown", e => {
-            // Prevent desktop page scroll when pressing arrow keys
             if (["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight", " "].includes(e.key)) {
                 e.preventDefault();
             }
