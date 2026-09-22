@@ -8,26 +8,41 @@
         body {
             background-color: #121212;
             color: #ffffff;
-            font-family: Arial, sans-serif;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            height: 100vh;
+            min-height: 100vh;
             margin: 0;
+        }
+        h1 {
+            margin-bottom: 5px;
         }
         #status-box {
             margin-bottom: 15px;
-            padding: 10px 20px;
+            padding: 8px 16px;
             border-radius: 5px;
             background-color: #1e1e1e;
             border: 1px solid #333;
             color: #FFD700;
+            font-size: 14px;
+        }
+        #score-board {
+            font-size: 20px;
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #4CAF50;
         }
         #gameCanvas {
             border: 3px solid #4CAF50;
             background-color: #000000;
             box-shadow: 0 0 20px rgba(76, 175, 80, 0.4);
+        }
+        .controls-hint {
+            margin-top: 15px;
+            color: #888;
+            font-size: 14px;
         }
     </style>
 </head>
@@ -35,10 +50,14 @@
 
     <h1>Java Full-Stack Snake Game</h1>
     <div id="status-box">Connecting to Java Backend...</div>
+    <div id="score-board">Score: 0</div>
 
-    <canvas id="gameCanvas" width="500" height="500"></canvas>
+    <canvas id="gameCanvas" width="400" height="400"></canvas>
+    
+    <div class="controls-hint">Use Arrow Keys (Up, Down, Left, Right) to play</div>
 
     <script>
+        // Check Backend Connection via Java API
         async function checkBackend() {
             try {
                 const res = await fetch('/api/status');
@@ -50,8 +69,111 @@
                 document.getElementById('status-box').style.color = "#FF5252";
             }
         }
-
         checkBackend();
+
+        // Snake Game Logic
+        const canvas = document.getElementById("gameCanvas");
+        const ctx = canvas.getContext("2d");
+
+        const gridSize = 20;
+        const tileCount = canvas.width / gridSize;
+
+        let snake = [{ x: 10, y: 10 }];
+        let food = { x: 5, y: 5 };
+        let dx = 0;
+        let dy = 0;
+        let score = 0;
+        let gameStarted = false;
+
+        function drawGame() {
+            // Clear screen
+            ctx.fillStyle = "#000000";
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            if (!gameStarted) {
+                ctx.fillStyle = "#ffffff";
+                ctx.font = "20px Arial";
+                ctx.textAlign = "center";
+                ctx.fillText("Press Any Arrow Key to Start", canvas.width / 2, canvas.height / 2);
+                return;
+            }
+
+            // Move Snake
+            const head = { x: snake[0].x + dx, y: snake[0].y + dy };
+
+            // Wall Collision
+            if (head.x < 0 || head.x >= tileCount || head.y < 0 || head.y >= tileCount) {
+                resetGame();
+                return;
+            }
+
+            // Self Collision
+            for (let i = 0; i < snake.length; i++) {
+                if (head.x === snake[i].x && head.y === snake[i].y) {
+                    resetGame();
+                    return;
+                }
+            }
+
+            snake.unshift(head);
+
+            // Eat Food
+            if (head.x === food.x && head.y === food.y) {
+                score += 10;
+                document.getElementById("score-board").innerText = "Score: " + score;
+                generateFood();
+            } else {
+                snake.pop();
+            }
+
+            // Draw Food
+            ctx.fillStyle = "#FF5252";
+            ctx.fillRect(food.x * gridSize, food.y * gridSize, gridSize - 2, gridSize - 2);
+
+            // Draw Snake
+            ctx.fillStyle = "#4CAF50";
+            for (let i = 0; i < snake.length; i++) {
+                ctx.fillRect(snake[i].x * gridSize, snake[i].y * gridSize, gridSize - 2, gridSize - 2);
+            }
+        }
+
+        function generateFood() {
+            food = {
+                x: Math.floor(Math.random() * tileCount),
+                y: Math.floor(Math.random() * tileCount)
+            };
+        }
+
+        function resetGame() {
+            alert("Game Over! Your Score: " + score);
+            snake = [{ x: 10, y: 10 }];
+            dx = 0;
+            dy = 0;
+            score = 0;
+            gameStarted = false;
+            document.getElementById("score-board").innerText = "Score: " + score;
+            generateFood();
+        }
+
+        // Keyboard Controls
+        window.addEventListener("keydown", e => {
+            switch (e.key) {
+                case "ArrowUp":
+                    if (dy !== 1) { dx = 0; dy = -1; gameStarted = true; }
+                    break;
+                case "ArrowDown":
+                    if (dy !== -1) { dx = 0; dy = 1; gameStarted = true; }
+                    break;
+                case "ArrowLeft":
+                    if (dx !== 1) { dx = -1; dy = 0; gameStarted = true; }
+                    break;
+                case "ArrowRight":
+                    if (dx !== -1) { dx = 1; dy = 0; gameStarted = true; }
+                    break;
+            }
+        });
+
+        setInterval(drawGame, 100);
     </script>
 </body>
 </html>
