@@ -11,62 +11,66 @@
             padding: 0;
         }
         body {
-            /* Background image setup from provided landscape */
-            background: url('https://i.ibb.co/3ykG8Lw/river-landscape.jpg') no-repeat center center fixed;
+            /* Pinterest Custom Background Image */
+            background: url('https://i.pinimg.com/736x/4e/ba/ff/4ebaff9d97e5678c8234d074956077fb.jpg') no-repeat center center fixed;
             background-size: cover;
-            font-family: 'Fredoka One', 'Segoe UI', cursive, sans-serif;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
             min-height: 100vh;
+            padding: 10px;
         }
         .game-card {
-            background: rgba(255, 255, 255, 0.25);
-            backdrop-filter: blur(10px);
-            border: 4px solid rgba(255, 255, 255, 0.6);
+            background: rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            border: 2px solid rgba(255, 255, 255, 0.4);
             border-radius: 20px;
-            padding: 20px;
-            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3);
+            padding: 15px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5);
             display: flex;
             flex-direction: column;
             align-items: center;
+            max-width: 100%;
         }
         h1 {
             color: #ffffff;
-            font-size: 36px;
-            text-shadow: 2px 3px 5px rgba(0,0,0,0.5);
-            margin-bottom: 10px;
+            font-size: 28px;
+            text-shadow: 2px 3px 5px rgba(0,0,0,0.7);
+            margin-bottom: 5px;
         }
         .stats-bar {
             display: flex;
             gap: 20px;
-            margin-bottom: 12px;
-            font-size: 20px;
+            margin-bottom: 10px;
+            font-size: 18px;
             color: #fff;
             font-weight: bold;
-            text-shadow: 1px 2px 4px rgba(0,0,0,0.6);
+            text-shadow: 1px 2px 4px rgba(0,0,0,0.8);
         }
         .level-buttons {
             display: flex;
-            gap: 10px;
-            margin-bottom: 15px;
+            gap: 8px;
+            margin-bottom: 12px;
+            flex-wrap: wrap;
+            justify-content: center;
         }
         .btn {
-            background: #ffffff;
+            background: rgba(255, 255, 255, 0.9);
             color: #333;
             border: none;
-            padding: 8px 16px;
-            font-size: 14px;
+            padding: 6px 14px;
+            font-size: 13px;
             font-weight: bold;
             border-radius: 20px;
             cursor: pointer;
             transition: all 0.2s ease;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
         }
         .btn:hover {
             transform: translateY(-2px);
-            box-shadow: 0 6px 10px rgba(0,0,0,0.3);
         }
         .btn.active {
             background: #4CAF50;
@@ -77,16 +81,47 @@
             color: white;
         }
         #gameCanvas {
-            border: 4px solid #ffffff;
+            border: 3px solid #ffffff;
             border-radius: 15px;
             background: rgba(255, 255, 255, 0.85);
-            box-shadow: inset 0 0 10px rgba(0,0,0,0.15);
+            box-shadow: inset 0 0 10px rgba(0,0,0,0.2);
+            max-width: 100%;
+            height: auto;
         }
-        .hint {
+        
+        /* On-screen Mobile Controls */
+        .controls-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
             margin-top: 10px;
-            color: #ffffff;
-            font-size: 14px;
-            text-shadow: 1px 1px 3px rgba(0,0,0,0.7);
+            gap: 5px;
+        }
+        .control-row {
+            display: flex;
+            gap: 10px;
+        }
+        .arrow-btn {
+            width: 50px;
+            height: 50px;
+            background: rgba(255, 255, 255, 0.9);
+            border: 2px solid #4CAF50;
+            border-radius: 50%;
+            font-size: 20px;
+            font-weight: bold;
+            color: #2e7d32;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            user-select: none;
+            cursor: pointer;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.4);
+            touch-action: manipulation;
+        }
+        .arrow-btn:active {
+            background: #4CAF50;
+            color: white;
+            transform: scale(0.95);
         }
     </style>
 </head>
@@ -106,15 +141,26 @@
             <button class="btn reload-btn" onclick="resetGame()">Reload 🔄</button>
         </div>
 
-        <canvas id="gameCanvas" width="400" height="400"></canvas>
-        <div class="hint">Use Arrow Keys (Up, Down, Left, Right) to play</div>
+        <canvas id="gameCanvas" width="340" height="340"></canvas>
+
+        <!-- On-Screen Controls for Mobile -->
+        <div class="controls-container">
+            <div class="control-row">
+                <button class="arrow-btn" onclick="handleTouch('ArrowUp')">▲</button>
+            </div>
+            <div class="control-row">
+                <button class="arrow-btn" onclick="handleTouch('ArrowLeft')">◄</button>
+                <button class="arrow-btn" onclick="handleTouch('ArrowDown')">▼</button>
+                <button class="arrow-btn" onclick="handleTouch('ArrowRight')">►</button>
+            </div>
+        </div>
     </div>
 
     <script>
         const canvas = document.getElementById("gameCanvas");
         const ctx = canvas.getContext("2d");
 
-        const gridSize = 20;
+        const gridSize = 17;
         const tileCount = canvas.width / gridSize;
 
         let snake = [{ x: 10, y: 10 }, { x: 10, y: 11 }];
@@ -124,7 +170,7 @@
         let score = 0;
         let gameStarted = false;
         let gameOver = false;
-        let speed = 150; // default easy speed
+        let speed = 150; 
         let gameLoop = null;
 
         function setLevel(level, element) {
@@ -146,7 +192,6 @@
         }
 
         function drawGame() {
-            // Draw background grid pattern
             for (let r = 0; r < tileCount; r++) {
                 for (let c = 0; c < tileCount; c++) {
                     ctx.fillStyle = (r + c) % 2 === 0 ? "#e8f5e9" : "#c8e6c9";
@@ -156,9 +201,9 @@
 
             if (!gameStarted) {
                 ctx.fillStyle = "#2e7d32";
-                ctx.font = "bold 18px Arial";
+                ctx.font = "bold 16px Arial";
                 ctx.textAlign = "center";
-                ctx.fillText("Press Arrow Key to Start!", canvas.width / 2, canvas.height / 2);
+                ctx.fillText("Press Buttons or Arrow Key to Start!", canvas.width / 2, canvas.height / 2);
                 return;
             }
 
@@ -167,26 +212,23 @@
                 ctx.fillRect(0, 0, canvas.width, canvas.height);
 
                 ctx.fillStyle = "#ffffff";
-                ctx.font = "bold 28px Arial";
+                ctx.font = "bold 24px Arial";
                 ctx.textAlign = "center";
                 ctx.fillText("Game Over!", canvas.width / 2, canvas.height / 2 - 10);
-                ctx.font = "18px Arial";
-                ctx.fillText("Score: " + score, canvas.width / 2, canvas.height / 2 + 25);
-                ctx.font = "14px Arial";
-                ctx.fillText("Click Reload or Press Key to Restart", canvas.width / 2, canvas.height / 2 + 55);
+                ctx.font = "16px Arial";
+                ctx.fillText("Score: " + score, canvas.width / 2, canvas.height / 2 + 20);
+                ctx.font = "13px Arial";
+                ctx.fillText("Click Reload to Restart", canvas.width / 2, canvas.height / 2 + 45);
                 return;
             }
 
-            // Move Snake
             const head = { x: snake[0].x + dx, y: snake[0].y + dy };
 
-            // Wall Collision
             if (head.x < 0 || head.x >= tileCount || head.y < 0 || head.y >= tileCount) {
                 gameOver = true;
                 return;
             }
 
-            // Self Collision
             for (let i = 0; i < snake.length; i++) {
                 if (head.x === snake[i].x && head.y === snake[i].y) {
                     gameOver = true;
@@ -196,7 +238,6 @@
 
             snake.unshift(head);
 
-            // Eat Food
             if (head.x === food.x && head.y === food.y) {
                 score += 10;
                 document.getElementById("score-board").innerText = "Score: " + score;
@@ -205,16 +246,15 @@
                 snake.pop();
             }
 
-            // Draw Cute Apple Food
+            // Draw Apple
             ctx.fillStyle = "#ff3d00";
             ctx.beginPath();
             ctx.arc(food.x * gridSize + gridSize/2, food.y * gridSize + gridSize/2, gridSize/2 - 2, 0, Math.PI * 2);
             ctx.fill();
-            // Leaf
             ctx.fillStyle = "#2e7d32";
             ctx.fillRect(food.x * gridSize + gridSize/2 - 1, food.y * gridSize + 2, 3, 4);
 
-            // Draw Cute Caterpillar Snake Body
+            // Draw Snake
             for (let i = 0; i < snake.length; i++) {
                 const x = snake[i].x * gridSize + gridSize / 2;
                 const y = snake[i].y * gridSize + gridSize / 2;
@@ -224,18 +264,17 @@
                 ctx.arc(x, y, gridSize / 2 - 1, 0, Math.PI * 2);
                 ctx.fill();
 
-                // Eyes on Head
                 if (i === 0) {
                     ctx.fillStyle = "#ffffff";
                     ctx.beginPath();
-                    ctx.arc(x - 4, y - 4, 3, 0, Math.PI * 2);
-                    ctx.arc(x + 4, y - 4, 3, 0, Math.PI * 2);
+                    ctx.arc(x - 3, y - 3, 2.5, 0, Math.PI * 2);
+                    ctx.arc(x + 3, y - 3, 2.5, 0, Math.PI * 2);
                     ctx.fill();
 
                     ctx.fillStyle = "#000000";
                     ctx.beginPath();
-                    ctx.arc(x - 4, y - 4, 1.5, 0, Math.PI * 2);
-                    ctx.arc(x + 4, y - 4, 1.5, 0, Math.PI * 2);
+                    ctx.arc(x - 3, y - 3, 1, 0, Math.PI * 2);
+                    ctx.arc(x + 3, y - 3, 1, 0, Math.PI * 2);
                     ctx.fill();
                 }
             }
@@ -260,12 +299,12 @@
             runGame();
         }
 
-        window.addEventListener("keydown", e => {
+        function changeDirection(key) {
             if (gameOver) {
                 resetGame();
                 return;
             }
-            switch (e.key) {
+            switch (key) {
                 case "ArrowUp":
                     if (dy !== 1) { dx = 0; dy = -1; gameStarted = true; }
                     break;
@@ -279,6 +318,14 @@
                     if (dx !== -1) { dx = 1; dy = 0; gameStarted = true; }
                     break;
             }
+        }
+
+        function handleTouch(key) {
+            changeDirection(key);
+        }
+
+        window.addEventListener("keydown", e => {
+            changeDirection(e.key);
         });
 
         generateFood();
