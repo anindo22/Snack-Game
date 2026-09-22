@@ -2,16 +2,19 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Snake Game</title>
     <style>
         * {
             box-sizing: border-box;
             margin: 0;
             padding: 0;
+            user-select: none;
+            -webkit-user-select: none;
+            touch-action: manipulation;
         }
         body {
-            /* Pinterest Custom Background Image */
+            /* Pinterest Background */
             background: url('https://i.pinimg.com/736x/4e/ba/ff/4ebaff9d97e5678c8234d074956077fb.jpg') no-repeat center center fixed;
             background-size: cover;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -23,22 +26,23 @@
             padding: 10px;
         }
         .game-card {
-            background: rgba(0, 0, 0, 0.4);
+            background: rgba(0, 0, 0, 0.45);
             backdrop-filter: blur(8px);
             -webkit-backdrop-filter: blur(8px);
             border: 2px solid rgba(255, 255, 255, 0.4);
             border-radius: 20px;
             padding: 15px;
-            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.6);
             display: flex;
             flex-direction: column;
             align-items: center;
-            max-width: 100%;
+            width: 100%;
+            max-width: 420px;
         }
         h1 {
             color: #ffffff;
-            font-size: 28px;
-            text-shadow: 2px 3px 5px rgba(0,0,0,0.7);
+            font-size: 26px;
+            text-shadow: 2px 3px 5px rgba(0,0,0,0.8);
             margin-bottom: 5px;
         }
         .stats-bar {
@@ -54,23 +58,25 @@
             display: flex;
             gap: 8px;
             margin-bottom: 12px;
-            flex-wrap: wrap;
+            width: 100%;
             justify-content: center;
         }
         .btn {
             background: rgba(255, 255, 255, 0.9);
             color: #333;
             border: none;
-            padding: 6px 14px;
-            font-size: 13px;
+            padding: 8px 14px;
+            font-size: 14px;
             font-weight: bold;
             border-radius: 20px;
             cursor: pointer;
             transition: all 0.2s ease;
             box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+            flex: 1;
+            max-width: 90px;
         }
-        .btn:hover {
-            transform: translateY(-2px);
+        .btn:active {
+            transform: scale(0.95);
         }
         .btn.active {
             background: #4CAF50;
@@ -79,49 +85,54 @@
         .reload-btn {
             background: #FF5722;
             color: white;
+            max-width: 100px;
         }
         #gameCanvas {
             border: 3px solid #ffffff;
             border-radius: 15px;
             background: rgba(255, 255, 255, 0.85);
             box-shadow: inset 0 0 10px rgba(0,0,0,0.2);
-            max-width: 100%;
+            width: 100%;
             height: auto;
+            max-width: 360px;
+            aspect-ratio: 1 / 1;
         }
         
-        /* On-screen Mobile Controls */
+        /* Larger Mobile Controls */
         .controls-container {
             display: flex;
             flex-direction: column;
             align-items: center;
-            margin-top: 10px;
-            gap: 5px;
+            margin-top: 15px;
+            gap: 8px;
+            width: 100%;
         }
         .control-row {
             display: flex;
-            gap: 10px;
+            gap: 15px;
+            justify-content: center;
         }
         .arrow-btn {
-            width: 50px;
-            height: 50px;
-            background: rgba(255, 255, 255, 0.9);
-            border: 2px solid #4CAF50;
+            width: 65px;
+            height: 65px;
+            background: rgba(255, 255, 255, 0.95);
+            border: 3px solid #4CAF50;
             border-radius: 50%;
-            font-size: 20px;
+            font-size: 26px;
             font-weight: bold;
             color: #2e7d32;
             display: flex;
             align-items: center;
             justify-content: center;
-            user-select: none;
             cursor: pointer;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.4);
-            touch-action: manipulation;
+            box-shadow: 0 6px 12px rgba(0,0,0,0.4);
+            outline: none;
+            -webkit-tap-highlight-color: transparent;
         }
         .arrow-btn:active {
             background: #4CAF50;
             color: white;
-            transform: scale(0.95);
+            transform: scale(0.9);
         }
     </style>
 </head>
@@ -143,7 +154,7 @@
 
         <canvas id="gameCanvas" width="340" height="340"></canvas>
 
-        <!-- On-Screen Controls for Mobile -->
+        <!-- Touch Controls for Mobile -->
         <div class="controls-container">
             <div class="control-row">
                 <button class="arrow-btn" onclick="handleTouch('ArrowUp')">▲</button>
@@ -203,7 +214,7 @@
                 ctx.fillStyle = "#2e7d32";
                 ctx.font = "bold 16px Arial";
                 ctx.textAlign = "center";
-                ctx.fillText("Press Buttons or Arrow Key to Start!", canvas.width / 2, canvas.height / 2);
+                ctx.fillText("Press Arrow Keys or Buttons!", canvas.width / 2, canvas.height / 2);
                 return;
             }
 
