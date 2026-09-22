@@ -30,7 +30,11 @@ public class Main {
     static class StaticFileHandler implements HttpHandler {
         @Override
         public void handle(HttpExchange exchange) throws IOException {
+            // Check both root and src directory for index.html
             File file = new File("index.html");
+            if (!file.exists()) {
+                file = new File("src/index.html");
+            }
 
             if (file.exists()) {
                 byte[] bytearray = new byte[(int) file.length()];
