@@ -30,10 +30,10 @@ public class Main {
     static class StaticFileHandler implements HttpHandler {
         @Override
         public void handle(HttpExchange exchange) throws IOException {
-            // Check both root and src directory for index.html
-            File file = new File("index.html");
+            // Priority given to src/index.html first
+            File file = new File("src/index.html");
             if (!file.exists()) {
-                file = new File("src/index.html");
+                file = new File("index.html");
             }
 
             if (file.exists()) {
@@ -42,7 +42,7 @@ public class Main {
                 fis.read(bytearray);
                 fis.close();
 
-                exchange.getResponseHeaders().add("Content-Type", "text/html");
+                exchange.getResponseHeaders().add("Content-Type", "text/html; charset=UTF-8");
                 exchange.sendResponseHeaders(200, file.length());
                 OutputStream os = exchange.getResponseBody();
                 os.write(bytearray);
