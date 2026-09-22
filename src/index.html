@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Java Full-Stack Snake Game</title>
+    <style>
+        body {
+            background-color: #121212;
+            color: #ffffff;
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+        }
+        #status-box {
+            margin-bottom: 15px;
+            padding: 10px 20px;
+            border-radius: 5px;
+            background-color: #1e1e1e;
+            border: 1px solid #333;
+            color: #FFD700;
+        }
+        #gameCanvas {
+            border: 3px solid #4CAF50;
+            background-color: #000000;
+            box-shadow: 0 0 20px rgba(76, 175, 80, 0.4);
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Java Full-Stack Snake Game</h1>
+    <div id="status-box">Connecting to Java Backend...</div>
+
+    <canvas id="gameCanvas" width="500" height="500"></canvas>
+
+    <script>
+        async function checkBackend() {
+            try {
+                const res = await fetch('/api/status');
+                const data = await res.json();
+                document.getElementById('status-box').innerText = "Backend Status: " + data.message;
+                document.getElementById('status-box').style.color = "#4CAF50";
+            } catch (err) {
+                document.getElementById('status-box').innerText = "Backend Status: Offline";
+                document.getElementById('status-box').style.color = "#FF5252";
+            }
+        }
+
+        checkBackend();
+    </script>
+</body>
+</html>
